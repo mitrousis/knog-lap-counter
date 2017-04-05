@@ -1,0 +1,23 @@
+{
+  "name": "knog-lap-counter",
+  "version": "1.0.0",
+  "description": "A lap counter with Knog bike lights",
+  "main": "index.js",
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/mitrousis/knog-lap-counter.git"
+  },
+  "author": "",
+  "license": "ISC",
+  "bugs": {
+    "url": "https://github.com/mitrousis/knog-lap-counter/issues"
+  },
+  "homepage": "https://github.com/mitrousis/knog-lap-counter#readme",
+  "dependencies": {
+    "async": "^2.3.0",
+    "terminal-kit": "^1.0.4"
+  }
+}
