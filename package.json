@@ -18,6 +18,7 @@
   "homepage": "https://github.com/mitrousis/knog-lap-counter#readme",
   "dependencies": {
     "async": "^2.3.0",
+    "node-hid": "^0.5.4",
     "terminal-kit": "^1.0.4"
   }
 }

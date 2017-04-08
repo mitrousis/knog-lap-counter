@@ -19,24 +19,25 @@ class LapCounter {
     this.digitManager      = new DigitManager()
     this.segmentController = new SegmentController(this.noSerial)
 
-    // Initial value display
-    this.segmentController.updateSegments(this.digitManager.segments)
-
     // For testing - keep incrementing
     this.segmentController.on('update', () => {
-
-      //console.log(this.digitManager.segments)
-
       // sequence run for testing
       if(this.runSequence){
         setTimeout(() => {
           this.sequenceNext()
-        }, 1000)
+        }, 3000)
         
       }
 
     })
 
+    // Putting a delay in for any relays to init. 
+    // could be better handled by 'ready' event
+    setTimeout( () => {
+      // Initial value display
+      this.segmentController.updateSegments(this.digitManager.segments)
+    },
+    2000)
   }
 
   triggerIncrement() {
