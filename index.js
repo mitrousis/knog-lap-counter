@@ -25,7 +25,7 @@ class LapCounter {
       if(this.runSequence){
         setTimeout(() => {
           this.sequenceNext()
-        }, 3000)
+        }, 2200)
         
       }
 

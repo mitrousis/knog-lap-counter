@@ -115,7 +115,7 @@ class SegmentController extends EventEmitter {
       this.setRelayState(segState, false)
 
       callback()
-    }, 2000)
+    }, 1500)
 
   }
 
@@ -141,7 +141,7 @@ class SegmentController extends EventEmitter {
       output = '-'
     } else {
       if(segState.state === 0) output = ' '
-      if(segState.state === 1) output = ''
+      if(segState.state === 1) output = '▓'
     }
     
     term.moveTo(segState.x + 2, segState.y + 2, output)
