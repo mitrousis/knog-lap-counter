@@ -2,6 +2,7 @@
 
 const DigitManager      = require('./src/DigitManager.js')
 const SegmentController = require('./src/SegmentController.js')
+const readline          = require('readline')
 
 class LapCounter {
   
@@ -38,6 +39,25 @@ class LapCounter {
       this.segmentController.updateSegments(this.digitManager.segments)
     },
     2000)
+
+
+    readline.emitKeypressEvents(process.stdin);
+    process.stdin.setRawMode(true);
+    process.stdin.on('keypress', (str, key) => {
+      if (key.ctrl && key.name === 'c') {
+        process.exit();
+      } else {
+        // TODO
+        // Up
+        if(key.sequence == '\u001b[A'){
+          this.triggerIncrement()
+        // Down
+        } else if(key.sequence == '\u001b[B'){
+          this.triggerDecrement()
+        }
+      }
+  });
+
   }
 
   triggerIncrement() {

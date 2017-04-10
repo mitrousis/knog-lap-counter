@@ -35,10 +35,10 @@ class DigitManager {
   set value(v){
     // Don't exceed 99 since that's all the digits we have
     this.currValue = v
-    this.currValue %= 99
+    this.currValue %= 100
 
     // And loop around if < 0
-    if(this.currValue < 0) this.currValue += 99
+    if(this.currValue < 0) this.currValue += 100
 
   }
 
