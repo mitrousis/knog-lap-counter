@@ -55,6 +55,16 @@ class LapCounter {
         } else if(key.sequence == '\u001b[B'){
           this.triggerDecrement()
         }
+
+	// Using preso controller
+	// page up
+	if(key.sequence == '\u001b[6~'){
+          this.triggerIncrement()
+        // page down
+        } else if(key.sequence == '\u001b[5~'){
+          this.triggerDecrement()
+        }
+
       }
   });
 

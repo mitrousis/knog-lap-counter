@@ -9,7 +9,7 @@ class RelayController {
   }
 
   openDevices(){
-    ftdi.find( (err, deviceList) => {
+    ftdi.find(1027, 24577, (err, deviceList) => {
 
       console.log('FTDI device list', deviceList)
 

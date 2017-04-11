@@ -1,6 +1,6 @@
 #!/bin/bash
 
-FTDI_LINUX_LINK='http://www.ftdichip.com/Drivers/D2XX/Linux/libftd2xx1.1.12.tar.gz'
+FTDI_LINUX_LINK='http://www.ftdichip.com/Drivers/D2XX/Linux/libftd2xx-arm-v6-hf-1.3.6.tgz'
 FTDI_LINUX_RPI='https://github.com/sim-san/node-ftdi/raw/master/libftd2xx1.1.12.RPi_Fix.tar.gz'
 FTDI_MAC_LINK='http://www.ftdichip.com/Drivers/D2XX/MacOSX/D2XX1.2.2.dmg'
 LIB_VERSION_LINUX='1.1.12'
@@ -30,16 +30,10 @@ then
    getcommand="curl -o $filename"
 fi
 
-if [ "$uname_machine" == 'x86_64' ]
-then
-   platform='64bit'
-elif [ "$uname_machine" == 'armv6l' ]
-then
+
    platform='RPi'
    link=$FTDI_LINUX_RPI
-else
-   platform='32bit'
-fi
+
 
 echo $ostype \($platform\)
 echo Download FTDI Library

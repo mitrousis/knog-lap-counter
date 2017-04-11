@@ -59,8 +59,8 @@ class SegmentController extends EventEmitter {
     ]
 
     // Clear terminal output - has nothing to do with serial functionality
-    term.clear()
-    term.hideCursor()
+    //term.clear()
+    //term.hideCursor()
 
     this.relayController = new RelayController()
     this.noSerial        = noSerial
@@ -135,7 +135,7 @@ class SegmentController extends EventEmitter {
   // Used for debugging in terminal
   dumpSegmentState(segState, relayOpen){
     // Show 'transition' if relay is open
-    let output = ''
+   /* let output = ''
 
     if(relayOpen) {
       output = '-'
@@ -147,7 +147,7 @@ class SegmentController extends EventEmitter {
     term.moveTo(segState.x + 2, segState.y + 2, output)
 
     // Move caret to below output for any logging
-    term.moveTo(1, 10)
+    term.moveTo(1, 10)*/
 
   }
 
