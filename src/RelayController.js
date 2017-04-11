@@ -1,10 +1,13 @@
 'use strict'
 
 const ftdi = require('ftdi')
+const EventEmitter = require('events')
 
-class RelayController {
+class RelayController extends EventEmitter {
   
   constructor() {
+    super()
+
     this.devices = []
   }
 
@@ -52,25 +55,39 @@ class RelayController {
 
   // Keeping buses numbered 0-3, will create a
   // lookup table if we need to map "bus" to specific port
-  setRelayState(busNum, relayNum, state){
+  storeRelayState(busNum, relayNum, state){
     if(this.devices[busNum] === undefined){
       //console.log(`FTDI device on bus ${busNum} not found.`)
 
     } else {
       this.devices[busNum].state[relayNum] = state
     
-      // Binary endian is reversed from array
-      let binaryString = this.devices[busNum].state.slice().reverse().join('')
-      let stateChar    = String.fromCharCode(parseInt(binaryString, 2))
+    }
+  }
 
-      //console.log(binaryString)
+  // Update all relays at once. Reset sets every relay to "off"
+  // without affecting the state stored here
+  sendRelayStates(reset = false){
+    for(let busNum=0; busNum < this.devices.length; busNum++){
 
+      let stateChar    = String.fromCharCode(0)
+
+      if(reset === false){
+        // Binary endian is reversed from array
+        let binaryString = this.devices[busNum].state.slice().reverse().join('')
+        stateChar    = String.fromCharCode(parseInt(binaryString, 2))
+      }
+
+      // Should add an event on complete
       this.devices[busNum].ftdi.write(stateChar, function(err) {
         if(err){
           console.log('FTDI Write Error', err, this)
+        } else {
+          
         }
       })
     }
+    
   }
 
   getDeviceState(busNum){
@@ -78,5 +95,6 @@ class RelayController {
   }
 
 }
+
 
 module.exports = RelayController

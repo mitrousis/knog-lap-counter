@@ -76,30 +76,55 @@ class SegmentController extends EventEmitter {
   }
 
   updateSegments(segmentsArray) {
-    //term('00').styleReset()
+
     // Run in parallel, but wait until every bus is triggered
     let segsToCycle = []
 
     // Update only if state has changed
     for(let i=0; i<segmentsArray.length; i++){
       if(this.segStates[i].state !== segmentsArray[i]){
-        segsToCycle.push(this.segStates[i])
+        //segsToCycle.push(this.segStates[i])
+
+        this.segStates[i].state = segmentsArray[i]
+
+        let segState = this.segStates[i]
+
+        // First trigger - open
+        if(!this.noSerial) this.relayController.storeRelayState(segState.bus, segState.relay, segState.state)
+        this.dumpSegmentState(segState, true)
+
       }
     }
 
-    async.each(segsToCycle, this.cycleSegmentState.bind(this), (err) => {
+    if(!this.noSerial) this.relayController.sendRelayStates()
+
+    // Timeout, then clear
+    setTimeout( () => {
+      if(!this.noSerial) this.relayController.sendRelayStates(true)
+
+      // Just updates the visuals
+      for(let seg of this.segStates){
+        this.dumpSegmentState(seg, false)
+      }
+
+      this.emit('update')
+
+    }, 1500)
+
+
+    /*async.each(segsToCycle, this.cycleSegmentState.bind(this), (err) => {
       if(err){
         throw(err)
       } else {
-        this.emit('update')
+        
       }
-    })
+    })*/
 
   }
 
   // We don't know if the light is off or on, 
   // so we can just switch states
-  cycleSegmentState(segState, callback){
+  /*cycleSegmentState(segState, callback){
     // Open, then timeout, then close relay
 
     // First trigger - open
@@ -117,17 +142,14 @@ class SegmentController extends EventEmitter {
       callback()
     }, 1500)
 
-  }
+  }*/
 
-  setRelayState(segState, relayOpen) {
-    this.dumpSegmentState(segState, relayOpen)
+  storeRelayState(segState) {
+    
 
     // Note that the relay open/closed state is 
     // separate from the segment state
-    if(!this.noSerial) {
-      let relayState = (relayOpen) ? 1 : 0
-      this.relayController.setRelayState(segState.bus, segState.relay, relayState)
-    }
+    
 
     // Do serial call here
   }
@@ -135,7 +157,7 @@ class SegmentController extends EventEmitter {
   // Used for debugging in terminal
   dumpSegmentState(segState, relayOpen){
     // Show 'transition' if relay is open
-   /* let output = ''
+   /*let output = ''
 
     if(relayOpen) {
       output = '-'
