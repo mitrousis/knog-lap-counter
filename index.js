@@ -22,6 +22,8 @@ class LapCounter {
 
     // For testing - keep incrementing
     this.segmentController.on('update', () => {
+      console.log(this.digitManager.value)
+      
       // sequence run for testing
       if(this.runSequence){
         setTimeout(() => {
@@ -55,18 +57,16 @@ class LapCounter {
         } else if(key.sequence == '\u001b[B'){
           this.triggerDecrement()
         }
-
-	// Using preso controller
-	// page up
-	if(key.sequence == '\u001b[6~'){
+    // Using preso controller
+	  // page up
+        if(key.sequence == '\u001b[6~'){
           this.triggerIncrement()
         // page down
         } else if(key.sequence == '\u001b[5~'){
           this.triggerDecrement()
         }
-
       }
-  });
+    });
 
   }
 
