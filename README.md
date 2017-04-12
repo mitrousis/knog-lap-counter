@@ -11,3 +11,23 @@ sequence = runs a count up/down
 decrement = count down from 99 
 noserial = disables serial comms (TBD)
 
+
+might need to disable some modules on pi before each run
+
+If the message "FT_Open failed" appears:
+    Perhaps the kernel automatically loaded another driver for the 
+    FTDI USB device.
+
+    sudo lsmod
+
+    If "ftdi_sio" is listed:
+        Unload it (and its helper module, usbserial), as follows.
+
+        sudo rmmod ftdi_sio
+        sudo rmmod usbserial
+
+    Otherwise, it's possible that libftd2xx does not recognise your 
+    device's Vendor and Product Identifiers.  Call FT_SetVIDPID before
+    calling FT_Open/FT_OpenEx/FT_ListDevices.
+
+
