@@ -87,15 +87,19 @@ class RelayController extends EventEmitter {
 
   // Update all relays at once. Reset sets every relay to "off"
   // without affecting the state stored here
-  sendRelayStates(reset = false){
+  sendRelayStates(reset){
     for(let d in this.devices){
 
       let dev       = this.devices[d]
 
       if(dev.connected){  
-        let stateChar = String.fromCharCode(0)
 
-        if(reset === false){
+        let stateChar
+
+        if(reset === true){
+          stateChar = String.fromCharCode(0)
+          
+        } else {
           // Binary endian is reversed from array
           let binaryString = dev.state.slice().reverse().join('')
           stateChar    = String.fromCharCode(parseInt(binaryString, 2))

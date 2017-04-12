@@ -20,7 +20,7 @@ const RelayController = require('./RelayController')
 
 class SegmentController extends EventEmitter {
   
-  constructor (noSerial = false){
+  constructor (noSerial){
     super()
 
     // Hard-coded per-relay bus. Assume everything is off when started
@@ -63,7 +63,7 @@ class SegmentController extends EventEmitter {
     //term.hideCursor()
 
     this.relayController = new RelayController()
-    this.noSerial        = noSerial
+    this.noSerial        = (noSerial === true)
 
     if(!this.noSerial) {
       this.relayController.openDevices()
