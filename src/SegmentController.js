@@ -27,14 +27,14 @@ class SegmentController extends EventEmitter {
     // The x and y positions are for information only and for the terminal dump
     this.segStates = [
     // 0-7
-      {'state' : 0, 'bus' : 2, 'relay' : 0, 'x' : 0, 'y': 0},
-      {'state' : 0, 'bus' : 2, 'relay' : 1, 'x' : 1, 'y': 0},
-      {'state' : 0, 'bus' : 2, 'relay' : 2, 'x' : 2, 'y': 0},
-      {'state' : 0, 'bus' : 2, 'relay' : 3, 'x' : 0, 'y': 1},
-      {'state' : 0, 'bus' : 2, 'relay' : 4, 'x' : 2, 'y': 1},
-      {'state' : 0, 'bus' : 2, 'relay' : 5, 'x' : 0, 'y': 2},
-      {'state' : 0, 'bus' : 2, 'relay' : 6, 'x' : 1, 'y': 2},
-      {'state' : 0, 'bus' : 2, 'relay' : 7, 'x' : 2, 'y': 2},
+      {'state' : 0, 'bus' : 0, 'relay' : 0, 'x' : 0, 'y': 0},
+      {'state' : 0, 'bus' : 0, 'relay' : 1, 'x' : 1, 'y': 0},
+      {'state' : 0, 'bus' : 0, 'relay' : 2, 'x' : 2, 'y': 0},
+      {'state' : 0, 'bus' : 0, 'relay' : 3, 'x' : 0, 'y': 1},
+      {'state' : 0, 'bus' : 0, 'relay' : 4, 'x' : 2, 'y': 1},
+      {'state' : 0, 'bus' : 0, 'relay' : 5, 'x' : 0, 'y': 2},
+      {'state' : 0, 'bus' : 0, 'relay' : 6, 'x' : 1, 'y': 2},
+      {'state' : 0, 'bus' : 0, 'relay' : 7, 'x' : 2, 'y': 2},
     // 8-15
       {'state' : 0, 'bus' : 1, 'relay' : 0, 'x' : 0, 'y': 3},
       {'state' : 0, 'bus' : 1, 'relay' : 1, 'x' : 2, 'y': 3},
@@ -45,14 +45,14 @@ class SegmentController extends EventEmitter {
       {'state' : 0, 'bus' : 1, 'relay' : 6, 'x' : 5, 'y': 0},
       {'state' : 0, 'bus' : 1, 'relay' : 7, 'x' : 6, 'y': 0},
     // 16 - 23
-      {'state' : 0, 'bus' : 0, 'relay' : 0, 'x' : 4, 'y': 1},
-      {'state' : 0, 'bus' : 0, 'relay' : 1, 'x' : 6, 'y': 1},
-      {'state' : 0, 'bus' : 0, 'relay' : 2, 'x' : 4, 'y': 2},
-      {'state' : 0, 'bus' : 0, 'relay' : 3, 'x' : 5, 'y': 2},
-      {'state' : 0, 'bus' : 0, 'relay' : 4, 'x' : 6, 'y': 2},
-      {'state' : 0, 'bus' : 0, 'relay' : 5, 'x' : 4, 'y': 3},
-      {'state' : 0, 'bus' : 0, 'relay' : 6, 'x' : 6, 'y': 3},
-      {'state' : 0, 'bus' : 0, 'relay' : 7, 'x' : 4, 'y': 4},
+      {'state' : 0, 'bus' : 2, 'relay' : 0, 'x' : 4, 'y': 1},
+      {'state' : 0, 'bus' : 2, 'relay' : 1, 'x' : 6, 'y': 1},
+      {'state' : 0, 'bus' : 2, 'relay' : 2, 'x' : 4, 'y': 2},
+      {'state' : 0, 'bus' : 2, 'relay' : 3, 'x' : 5, 'y': 2},
+      {'state' : 0, 'bus' : 2, 'relay' : 4, 'x' : 6, 'y': 2},
+      {'state' : 0, 'bus' : 2, 'relay' : 5, 'x' : 4, 'y': 3},
+      {'state' : 0, 'bus' : 2, 'relay' : 6, 'x' : 6, 'y': 3},
+      {'state' : 0, 'bus' : 2, 'relay' : 7, 'x' : 4, 'y': 4},
     // 24 - 25
       {'state' : 0, 'bus' : 3, 'relay' : 0, 'x' : 5, 'y': 4},
       {'state' : 0, 'bus' : 3, 'relay' : 1, 'x' : 6, 'y': 4}
