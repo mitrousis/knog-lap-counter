@@ -8,32 +8,49 @@ class RelayController extends EventEmitter {
   constructor() {
     super()
 
-    this.devices = []
+    // In order by serial
+    this.devices = {
+      'AI050LQL' : {
+        'bus' : 0
+      },
+      'AI050LZZ' : {
+        'bus' : 1
+      },
+      'AI050LMX' : {
+        'bus' : 2
+      },
+      'AI050LQN' : {
+        'bus' : 3
+      }
+    }
   }
 
   openDevices(){
     ftdi.find(1027, 24577, (err, deviceList) => {
 
-      console.log('FTDI device list', deviceList)
+      //console.log('FTDI device list', deviceList)
 
       for(let i=0; i<deviceList.length; i++){
-        let device = new ftdi.FtdiDevice(deviceList[i])
-        this.devices.push({
-          ftdi  : device,
-          state : [0,0,0,0,0,0,0,0]
+        let ftdiDevice    = new ftdi.FtdiDevice(deviceList[i])
+        let serial        = deviceList[i].serialNumber
+        let device        = this.devices[serial]
+        device.ftdiDevice = ftdiDevice
+        device.state      = [0,0,0,0,0,0,0,0]
+
+        console.log(`Found FTDI device ${serial}`)
+
+
+        ftdiDevice.on('error', function(err) {
+          console.log('FTDI Find Error', err)
         })
 
-        device.on('error', function(err) {
-          console.log('FTDI Find Error', err, this)
-        })
-
-        device.on('data', function(data) {
+        ftdiDevice.on('data', function(data) {
           // Ignore any data from device
         })
 
         // Basic settings to connect to Sainsmart relay
         // not the bit band bitmode, which allows us to simply trigger pins
-        device.open({
+        ftdiDevice.open({
           baudrate: 9600,
           databits: 8,
           stopbits: 1,
@@ -43,7 +60,7 @@ class RelayController extends EventEmitter {
         },
         function(err) {
           if(err){
-            console.log('FTDI Open Error', err, this)
+            console.log('FTDI Open Error', err)
           } else {
 
           }
@@ -56,32 +73,30 @@ class RelayController extends EventEmitter {
   // Keeping buses numbered 0-3, will create a
   // lookup table if we need to map "bus" to specific port
   storeRelayState(busNum, relayNum, state){
-    if(this.devices[busNum] === undefined){
-      //console.log(`FTDI device on bus ${busNum} not found.`)
-
-    } else {
-      this.devices[busNum].state[relayNum] = state
-    
+    for(let d of this.devices){
+      if(d.bus === busNum){
+        d.state.state[relayNum] = state
+      }
     }
   }
 
   // Update all relays at once. Reset sets every relay to "off"
   // without affecting the state stored here
   sendRelayStates(reset = false){
-    for(let busNum=0; busNum < this.devices.length; busNum++){
+    for(let dev of this.devices){
 
       let stateChar    = String.fromCharCode(0)
 
       if(reset === false){
         // Binary endian is reversed from array
-        let binaryString = this.devices[busNum].state.slice().reverse().join('')
+        let binaryString = dev.state.slice().reverse().join('')
         stateChar    = String.fromCharCode(parseInt(binaryString, 2))
       }
 
       // Should add an event on complete
-      this.devices[busNum].ftdi.write(stateChar, function(err) {
+      dev.ftdiDevice.write(stateChar, function(err) {
         if(err){
-          console.log('FTDI Write Error', err, this)
+          console.log('FTDI Write Error', err)
         } else {
           
         }
