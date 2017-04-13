@@ -17,17 +17,17 @@ class RelayController extends EventEmitter {
       },
       'AI050LZZ' : {
         'bus' : 1,
-        'connected' : false,
+        'connected' : true,
         'state' : [0,0,0,0,0,0,0,0]
       },
       'AI050LMX' : {
         'bus' : 2,
-        'connected' : false,
+        'connected' : true,
         'state' : [0,0,0,0,0,0,0,0]
       },
       'AI050LQN' : {
         'bus' : 3,
-        'connected' : false,
+        'connected' : true,
         'state' : [0,0,0,0,0,0,0,0]
       }
     }
@@ -104,13 +104,17 @@ class RelayController extends EventEmitter {
       let dev       = this.devices[devSerial]
 
       if(dev.connected){
-        for(let relayNum in dev.state){
+        for(let relayNum = 0; relayNum < dev.state.length; relayNum ++){
+
           let relayState = (dev.state[relayNum] === 0 || reset === true) ? 'OFF' : 'ON'
 
+          console.log(devSerial, relayNum + 1, relayState)
+
           // TODO - run this async
+          // Note that command takes 1-based relay num and state as OFF|ON string
           ChildProcess.execFileSync(
-            __dirname + '/bin/crelay', 
-            ['-s', devSerial, relayNum, relayState], 
+            __dirname + '/../bin/crelay', 
+            ['-s', devSerial, relayNum + 1, relayState], 
             {}, 
             function(err, stdout) { 
               console.log(err)
