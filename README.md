@@ -12,6 +12,19 @@ decrement = count down from 99
 noserial = disables serial comms (TBD)
 
 
+installing node on raspberry pi
+
+get version 5.x (hope this helps ftdi lib erros)
+
+$ curl -sL https://deb.nodesource.com/setup_5.x | sudo -E bash -
+
+$ sudo apt-get install nodejs
+
+-- need to get FTDI drivers ---
+
+$ npm install
+
+
 might need to disable some modules on pi before each run
 
 If the message "FT_Open failed" appears:
@@ -23,8 +36,8 @@ If the message "FT_Open failed" appears:
     If "ftdi_sio" is listed:
         Unload it (and its helper module, usbserial), as follows.
 
-        sudo rmmod ftdi_sio
-        sudo rmmod usbserial
+sudo rmmod ftdi_sio
+sudo rmmod usbserial
 
     Otherwise, it's possible that libftd2xx does not recognise your 
     device's Vendor and Product Identifiers.  Call FT_SetVIDPID before
