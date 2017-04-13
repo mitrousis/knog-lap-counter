@@ -1,6 +1,6 @@
 'use strict'
 
-const ftdi = require('ftdi')
+const ChildProcess = require('child_process')
 const EventEmitter = require('events')
 
 class RelayController extends EventEmitter {
@@ -12,63 +12,77 @@ class RelayController extends EventEmitter {
     this.devices = {
       'AI050LQL' : {
         'bus' : 0,
-        'connected' : false
+        'connected' : true,
+        'state' : [0,0,0,0,0,0,0,0]
       },
       'AI050LZZ' : {
         'bus' : 1,
-        'connected' : false
+        'connected' : false,
+        'state' : [0,0,0,0,0,0,0,0]
       },
       'AI050LMX' : {
         'bus' : 2,
-        'connected' : false
+        'connected' : false,
+        'state' : [0,0,0,0,0,0,0,0]
       },
       'AI050LQN' : {
         'bus' : 3,
-        'connected' : false
+        'connected' : false,
+        'state' : [0,0,0,0,0,0,0,0]
       }
     }
   }
 
-  openDevices(){
-    ftdi.find(1027, 24577, (err, deviceList) => {
+  // useFTDI uses the node module vs
+  // the CLI tool "crelay"
+  init(useFTDI){
 
-      for(let i=0; i<deviceList.length; i++){
-        let ftdiDevice    = new ftdi.FtdiDevice(deviceList[i])
-        let serial        = deviceList[i].serialNumber
+    this.useFTDI = (useFTDI === true)
 
-        let device        = this.devices[serial]
-        device.ftdiDevice = ftdiDevice
-        device.state      = [0,0,0,0,0,0,0,0]
-        device.connected  = true
+    if(this.useFTDI){
+      const ftdi = require('ftdi')
 
-        console.log(`Found FTDI device ${serial}`)
+      ftdi.find(1027, 24577, (err, deviceList) => {
 
-        ftdiDevice.on('error', function(err) {
-          console.log('FTDI error ${serial}', err)
-        })
+        for(let i=0; i<deviceList.length; i++){
+          let ftdiDevice    = new ftdi.FtdiDevice(deviceList[i])
+          let serial        = deviceList[i].serialNumber
 
-        ftdiDevice.on('data', function(data) {
-          console.log('FTDI data ${serial}', data)
-        })
+          let device        = this.devices[serial]
+          device.ftdiDevice = ftdiDevice
+          device.connected  = true
 
-        // Basic settings to connect to Sainsmart relay
-        // not the bit band bitmode, which allows us to simply trigger pins
-        ftdiDevice.open({
-          baudrate: 9600,
-          databits: 8,
-          stopbits: 1,
-          parity: 'none',
-          bitmode: 'sync', // async dies right away, sync works for a while then dies
-          bitmask: 0xff
-        },
-        function(err) {
-          if(err){
-            console.log('FTDI Open Error ${serial}', err)
-          }
-        })
-      }
+          console.log(`Found FTDI device ${serial}`)
 
-    })
+          ftdiDevice.on('error', function(err) {
+            console.log('FTDI error ${serial}', err)
+          })
+
+          ftdiDevice.on('data', function(data) {
+            console.log('FTDI data ${serial}', data)
+          })
+
+          // Basic settings to connect to Sainsmart relay
+          // not the bit band bitmode, which allows us to simply trigger pins
+          ftdiDevice.open({
+            baudrate: 9600,
+            databits: 8,
+            stopbits: 1,
+            parity: 'none',
+            bitmode: 'sync', // async dies right away, sync works for a while then dies
+            bitmask: 0xff
+          },
+          function(err) {
+            if(err){
+              console.log('FTDI Open Error ${serial}', err)
+            }
+          })
+        }
+
+      })
+    } else {
+      // Use the command line tool
+    }
   }
 
   // Keeping buses numbered 0-3, will create a
@@ -77,7 +91,7 @@ class RelayController extends EventEmitter {
     for(let d in this.devices){
       let dev = this.devices[d]
 
-      if(dev.connected && dev.bus === busNum){
+      if(dev.bus === busNum){
         dev.state[relayNum] = state
       }
     }
@@ -86,12 +100,32 @@ class RelayController extends EventEmitter {
   // Update all relays at once. Reset sets every relay to "off"
   // without affecting the state stored here
   sendRelayStates(reset){
-    for(let d in this.devices){
+    for(let devSerial in this.devices){
+      let dev       = this.devices[devSerial]
 
+      if(dev.connected){
+        for(let relayNum in dev.state){
+          let relayState = (dev.state[relayNum] === 0 || reset === true) ? 'OFF' : 'ON'
+
+          // TODO - run this async
+          ChildProcess.execFileSync(
+            __dirname + '/bin/crelay', 
+            ['-s', devSerial, relayNum, relayState], 
+            {}, 
+            function(err, stdout) { 
+              console.log(err)
+            }
+          )
+
+        }
+      }
+    }
+
+
+    /*for(let d in this.devices){
       let dev       = this.devices[d]
 
       if(dev.connected){  
-
         let stateChar = ''
 
         if(reset === true){
@@ -110,9 +144,11 @@ class RelayController extends EventEmitter {
           }
         })
       }
-    }
+    }*/
     
   }
+
+
 
   getDeviceState(busNum){
     return this.devices[busNum].state

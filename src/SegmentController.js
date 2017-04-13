@@ -62,11 +62,12 @@ class SegmentController extends EventEmitter {
     //term.clear()
     //term.hideCursor()
 
-    this.relayController = new RelayController()
     this.noSerial        = (noSerial === true)
 
     if(!this.noSerial) {
-      this.relayController.openDevices()
+      this.relayController = new RelayController()
+
+      this.relayController.init()
     }
 
     // Initial 'zero-ing' of terminal display
