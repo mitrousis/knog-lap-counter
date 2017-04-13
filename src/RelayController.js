@@ -48,7 +48,7 @@ class RelayController extends EventEmitter {
         })
 
         ftdiDevice.on('data', function(data) {
-          // Ignore any data from device
+          console.log('FTDI data ${serial}', data)
         })
 
         // Basic settings to connect to Sainsmart relay
@@ -58,14 +58,12 @@ class RelayController extends EventEmitter {
           databits: 8,
           stopbits: 1,
           parity: 'none',
-          bitmode: 'sync',
+          bitmode: 'sync', // async dies right away, sync works for a while then dies
           bitmask: 0xff
         },
         function(err) {
           if(err){
             console.log('FTDI Open Error ${serial}', err)
-          } else {
-
           }
         })
       }
@@ -94,23 +92,21 @@ class RelayController extends EventEmitter {
 
       if(dev.connected){  
 
-        let stateChar
+        let stateChar = ''
 
         if(reset === true){
           stateChar = String.fromCharCode(0)
-          
+
         } else {
           // Binary endian is reversed from array
           let binaryString = dev.state.slice().reverse().join('')
-          stateChar    = String.fromCharCode(parseInt(binaryString, 2))
+          stateChar        = String.fromCharCode(parseInt(binaryString, 2))
         }
 
         // Should add an event on complete
         dev.ftdiDevice.write(stateChar, function(err) {
           if(err){
             console.log(`FTDI Write Error ${d}`, err)
-          } else {
-            
           }
         })
       }
