@@ -10,37 +10,44 @@ class LapCounter {
     this.runSequence  = false
     this.noSerial     = false
     this.runDecrement = false
+    this.startAt      = 0
 
     for(let arg of process.argv){
       if(arg === 'sequence') this.runSequence   = true
       if(arg === 'noserial') this.noSerial      = true
       if(arg === 'decrement') this.runDecrement = true
+      if(arg.indexOf('startat') === 0) this.startAt = parseInt(arg.split('=')[1])
     }
 
     this.digitManager      = new DigitManager()
     this.segmentController = new SegmentController(this.noSerial)
 
+    this.digitManager.value = this.startAt
+    //this.preUpdateValue     = this.digitManager.value
+
     // For testing - keep incrementing
     this.segmentController.on('update', () => {
-      console.log(this.digitManager.value)
-      
+    
       // sequence run for testing
       if(this.runSequence){
         setTimeout(() => {
           this.sequenceNext()
         }, 2200)
         
+      } else {
+        // Could add hook to allow changes to value while updating
+        //this.preUpdateValue 
       }
 
     })
 
     // Putting a delay in for any relays to init. 
     // could be better handled by 'ready' event
-    setTimeout( () => {
+    //setTimeout( () => {
       // Initial value display
-      this.segmentController.updateSegments(this.digitManager.segments)
-    },
-    2000)
+    this.segmentController.updateSegments(this.digitManager.segments)
+    //},
+    //2000)
 
 
     readline.emitKeypressEvents(process.stdin);
@@ -71,13 +78,17 @@ class LapCounter {
   }
 
   triggerIncrement() {
-    this.digitManager.increment()
-    this.segmentController.updateSegments(this.digitManager.segments)
+    if(!this.segmentController.isUpdating){
+      this.digitManager.increment()
+      this.segmentController.updateSegments(this.digitManager.segments)
+    }
   }
 
   triggerDecrement(){
-    this.digitManager.decrement()
-    this.segmentController.updateSegments(this.digitManager.segments)
+    if(!this.segmentController.isUpdating){
+      this.digitManager.decrement()
+      this.segmentController.updateSegments(this.digitManager.segments)
+    }
   }
 
   sequenceNext(){

@@ -50,7 +50,8 @@ class DigitManager {
   get segments(){
     let padded = ('00' + this.currValue.toString()).substring(this.currValue.toString().length)
 
-    let dig0 = this.digits[padded.charAt(0)]
+    // Leading zeros now result as "off"
+    let dig0 = (padded.charAt(0) !== '0') ? this.digits[padded.charAt(0)] : this.digits.off
     let dig1 = this.digits[padded.charAt(1)]
 
     return dig0.concat(dig1)

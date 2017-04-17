@@ -5,8 +5,10 @@ const EventEmitter = require('events')
 
 class RelayController extends EventEmitter {
   
-  constructor() {
+  constructor(noSerial) {
     super()
+
+    this.noSerial = (noSerial === true)
 
     // In order by serial
     this.devices = {
@@ -33,9 +35,51 @@ class RelayController extends EventEmitter {
     }
   }
 
+  // Removed all the FTDI stuff
+  setRelayState(busNum, relayNum, state, callback){
+    for(let devSerial in this.devices){
+      let dev = this.devices[devSerial]
+
+      if(dev.bus === busNum){
+        let oldState = dev.state[relayNum]
+
+        if(oldState !== state){
+          dev.state[relayNum] = state
+
+          let relayState = (state === 0) ? 'OFF' : 'ON'
+
+          //console.log('bus: ', busNum, 'relay:', relayNum, 'state:', relayState)
+
+          if(this.noSerial){
+            // Simulate a serial call for testing
+            setTimeout(() => {
+              callback()
+            }, 20)
+          } else {
+            // Note that command takes 1-based relay num and state as OFF|ON string
+            ChildProcess.execFile(
+              __dirname + '/../bin/crelay', 
+              ['-s', devSerial, relayNum + 1, state], 
+              {}, 
+              function(err, stdout) { 
+                callback(err)
+              }
+            )
+          }
+          
+        // No change to relay
+        } else {
+          callback()
+        }
+        
+      }
+    }
+  }
+
+
   // useFTDI uses the node module vs
   // the CLI tool "crelay"
-  init(useFTDI){
+  /*init(useFTDI){
 
     this.useFTDI = (useFTDI === true)
 
@@ -83,11 +127,11 @@ class RelayController extends EventEmitter {
     } else {
       // Use the command line tool
     }
-  }
+  }*/
 
   // Keeping buses numbered 0-3, will create a
   // lookup table if we need to map "bus" to specific port
-  storeRelayState(busNum, relayNum, state){
+  /*storeRelayState(busNum, relayNum, state){
     for(let d in this.devices){
       let dev = this.devices[d]
 
@@ -126,31 +170,9 @@ class RelayController extends EventEmitter {
     }
 
 
-    /*for(let d in this.devices){
-      let dev       = this.devices[d]
-
-      if(dev.connected){  
-        let stateChar = ''
-
-        if(reset === true){
-          stateChar = String.fromCharCode(0)
-
-        } else {
-          // Binary endian is reversed from array
-          let binaryString = dev.state.slice().reverse().join('')
-          stateChar        = String.fromCharCode(parseInt(binaryString, 2))
-        }
-
-        // Should add an event on complete
-        dev.ftdiDevice.write(stateChar, function(err) {
-          if(err){
-            console.log(`FTDI Write Error ${d}`, err)
-          }
-        })
-      }
-    }*/
     
-  }
+    
+  }*/
 
 
 

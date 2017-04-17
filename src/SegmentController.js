@@ -59,16 +59,14 @@ class SegmentController extends EventEmitter {
     ]
 
     // Clear terminal output - has nothing to do with serial functionality
-    //term.clear()
-    //term.hideCursor()
+    term.clear()
+    term.hideCursor()
 
-    this.noSerial        = (noSerial === true)
+    this.noSerial   = (noSerial === true)
+    this.isUpdating = false
 
-    if(!this.noSerial) {
-      this.relayController = new RelayController()
+    this.relayController = new RelayController(this.noSerial)
 
-      this.relayController.init()
-    }
 
     // Initial 'zero-ing' of terminal display
     for(let seg of this.segStates){
@@ -77,6 +75,9 @@ class SegmentController extends EventEmitter {
   }
 
   updateSegments(segmentsArray) {
+    if(this.isUpdating) return false
+      
+    this.isUpdating = true
 
     // Run in parallel, but wait until every bus is triggered
     let segsToCycle = []
@@ -84,33 +85,54 @@ class SegmentController extends EventEmitter {
     // Update only if state has changed
     for(let i=0; i<segmentsArray.length; i++){
       if(this.segStates[i].state !== segmentsArray[i]){
-        //segsToCycle.push(this.segStates[i])
-
+        
         this.segStates[i].state = segmentsArray[i]
 
-        let segState = this.segStates[i]
+        // Add segment to cycle list
+        segsToCycle.push(this.segStates[i])
 
-        // First trigger - open
-        if(!this.noSerial) this.relayController.storeRelayState(segState.bus, segState.relay, segState.state)
-        this.dumpSegmentState(segState, true)
+        //let segState = this.segStates[i]
 
       }
     }
 
-    if(!this.noSerial) this.relayController.sendRelayStates()
+    // Run through every segment that needs cycling
+    async.each(segsToCycle, (segStateObject, asyncCB) => {
+      // First trigger - open
+      this.relayController.setRelayState(segStateObject.bus, segStateObject.relay, segStateObject.state, () => {
+        this.dumpSegmentState(segStateObject, true)
+        asyncCB()
+      })
+      //this.dumpSegmentState(segState, true)
+
+    }, (err) => {
+      if(err){
+        throw(err)
+      }
+    })
+
+    // Then wait, and run full 'off'
+    setTimeout( () => {
+      async.each(this.segStates, (segStateObject, asyncCB) => {
+      // Force '0' close
+        this.relayController.setRelayState(segStateObject.bus, segStateObject.relay, 0, () => {
+          this.dumpSegmentState(segStateObject, false)
+          asyncCB()
+        })
+      }, (err) => {
+        if(err){
+          throw(err)
+        } else {
+          this.isUpdating = false
+          this.emit('update')
+        }
+      })
+    }, 1500)
+
+    //if(!this.noSerial) this.relayController.sendRelayStates()
 
     // Timeout, then clear
-    setTimeout( () => {
-      if(!this.noSerial) this.relayController.sendRelayStates(true)
-
-      // Just updates the visuals
-      for(let seg of this.segStates){
-        this.dumpSegmentState(seg, false)
-      }
-
-      this.emit('update')
-
-    }, 1500)
+    
 
 
     /*async.each(segsToCycle, this.cycleSegmentState.bind(this), (err) => {
@@ -158,7 +180,7 @@ class SegmentController extends EventEmitter {
   // Used for debugging in terminal
   dumpSegmentState(segState, relayOpen){
     // Show 'transition' if relay is open
-   /*let output = ''
+   let output = ''
 
     if(relayOpen) {
       output = '-'
@@ -170,7 +192,7 @@ class SegmentController extends EventEmitter {
     term.moveTo(segState.x + 2, segState.y + 2, output)
 
     // Move caret to below output for any logging
-    term.moveTo(1, 10)*/
+    term.moveTo(1, 10)
 
   }
 
