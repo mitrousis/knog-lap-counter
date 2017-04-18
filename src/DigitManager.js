@@ -26,7 +26,13 @@ class DigitManager {
       '7' : [1, 1, 1, 0, 1, 0, 0, 1, 0, 1, 0, 0, 1],
       '8' : [1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1],
       '9' : [1, 1, 1, 1, 1, 1, 1, 1, 0, 1, 0, 0, 1],
-    'off' : [0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0]
+    'off' : [0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0],
+
+    'smile' : [0,0,1,0,1,0,0,0,1,0,1,1,1,1,0,0,1,0,0,0,0,0,1,1,1,1],
+    'K'   : [1,0,1,1,1,1,1,0,1,1,1,0,1],
+    'N'   : [1,1,0,1,1,1,0,1,1,1,1,0,1],
+    'O'   : [1,1,1,1,1,1,0,1,1,1,1,1,1],
+    'G'   : [1,1,1,1,0,1,0,1,1,1,1,1,1]
     }
 
     this.currValue = 0
@@ -48,13 +54,29 @@ class DigitManager {
   }
 
   get segments(){
-    let padded = ('00' + this.currValue.toString()).substring(this.currValue.toString().length)
+    
+    if(this.currValue === 99){
+      return this.digits.off.concat(this.digits.off)
 
-    // Leading zeros now result as "off"
-    let dig0 = (padded.charAt(0) !== '0') ? this.digits[padded.charAt(0)] : this.digits.off
-    let dig1 = this.digits[padded.charAt(1)]
+    } else if(this.currValue === 98){
+      return this.digits.smile.slice()
 
-    return dig0.concat(dig1)
+    // Testing fun
+    } else if(this.currValue >= 94 && this.currValue <= 97){
+      let letters = {94: 'K', 95: 'N', 96: 'O', 97: 'G'}
+
+      return this.digits[letters[this.currValue]].concat(this.digits.off)
+
+    } else {
+      let padded = ('00' + this.currValue.toString()).substring(this.currValue.toString().length)
+
+      // Leading zeros now result as "off"
+      let dig0 = (padded.charAt(0) !== '0') ? this.digits[padded.charAt(0)] : this.digits.off
+      let dig1 = this.digits[padded.charAt(1)]
+
+      return dig0.concat(dig1)
+    }
+    
   }
 
   increment(){

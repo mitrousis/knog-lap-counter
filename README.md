@@ -13,6 +13,16 @@ noserial = disables serial comms
 startat=[x] = starts the digits at provided x value. defaults to 0
 
 
+installing on raspberry pi
+
+edit rc.local to startup virtual terminal on boot
+$ sudo nano \etc\rc.local
+
+add this line above "exit 0"
+openvt -s -w /home/pi/knog-lap-counter/tools/rpi-start.sh &
+
+
+
 
 installing node on raspberry pi
 
